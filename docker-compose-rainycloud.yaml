@@ -1,0 +1,45 @@
+services:
+  fontawesome:
+    image: fonty
+    container_name: fonty
+    ports:
+      - 2045:2045
+  rainycloud:
+    image: rainycloud
+    container_name: rainyCloud
+    ports:
+      - 4000:4000
+      - 3003:3000
+    depends_on:
+      - fontawesome
+      - mongodb
+    volumes:
+      - rainyCloudFiles:/app/serverfiles
+      - rainyCloudImages:/app/serverimages
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodbData:/data/db
+
+volumes:
+  rainyCloudFiles:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/webstorm/rainCloud/serverfiles
+  rainyCloudImages:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/webstorm/rainCloud/serverimages
+  mongodbData:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/databases/MongoDBdata

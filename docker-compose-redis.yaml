@@ -1,0 +1,22 @@
+services:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - redis-network
+    volumes:
+      - redisData:/data
+
+volumes:
+  redisData:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/databases/redisData
+
+networks:
+  redis-network:
+    driver: bridge

@@ -1,0 +1,24 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmqconf:/etc/rabbitmq/rabbitmq.conf
+      - rabbitmqdata:/var/lib/rabbitmq
+
+volumes:
+  rabbitmqconf:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/conf/rabbitmq.conf
+  rabbitmqdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/databases/rabbitmq

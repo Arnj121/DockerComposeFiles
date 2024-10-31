@@ -1,0 +1,39 @@
+services:
+  fontawesome:
+    image: fonty
+    container_name: fonty
+    ports:
+      - 2045:2045
+  webos:
+    image: webos
+    container_name: WebOS
+    ports:
+      - 2000:2000
+      - 2002:2002
+    depends_on:
+      - fontawesome
+      - mongodb
+    volumes:
+      - webosData:/app/static/userfiles
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodbData:/data/db
+
+
+volumes:
+  webosData:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/webstorm/WebOS/static/userfiles
+  mongodbData:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/databases/MongoDBdata
