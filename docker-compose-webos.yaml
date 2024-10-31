@@ -6,7 +6,7 @@ services:
       - 2045:2045
   webos:
     image: webos
-    container_name: WebOS
+    container_name: webOS
     ports:
       - 2000:2000
       - 2002:2002
@@ -14,7 +14,7 @@ services:
       - fontawesome
       - mongodb
     volumes:
-      - webosData:/app/static/userfiles
+      - webosfiles:/app/static/userfiles
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -23,14 +23,13 @@ services:
     volumes:
       - mongodbData:/data/db
 
-
 volumes:
-  webosData:
+  webosfiles:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: D:/webstorm/WebOS/static/userfiles
+      device: D:/webstorm/webos/static/userfiles
   mongodbData:
     driver: local
     driver_opts:
