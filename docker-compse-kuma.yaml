@@ -1,0 +1,16 @@
+services:
+  uptimeKuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptimekuma
+    volumes:
+      - uptimekumdata:/app/data
+    ports:
+      - 3001:3001
+
+volumes:
+  uptimekumaData:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/databases/uptimekuma
