@@ -7,20 +7,15 @@ Parameters:
     Type: String
     Default: codepipeline
 
-  GitHubRepository:
-    Description: The GitHub repository name (e.g., username/repo-name)
+  S3BucketName:
+    Description: Name of the S3 bucket that stores source artifacts
     Type: String
-    Default: arnj121/webos
+    Default: webos-534424
 
-  GitHubBranch:
-    Description: The branch of the GitHub repository to use
+  S3ObjectKey:
+    Description: Path to the source artifact in the S3 bucket (e.g., 'source.zip')
     Type: String
-    Default: master
-
-  CodeStarConnectionArn:
-    Description: CodeStar Connection ARN for GitHub App integration
-    Type: String
-    Default: arn:aws:codeconnections:us-east-1:851725471730:connection/9759bf34-f347-4e43-99a4-fdd7ec433516
+    Default: source.zip
 
   ApplicationName:
     Description: The name of the CodeDeploy application
@@ -76,18 +71,17 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: GitHub_Source
+            - Name: S3_Source
               ActionTypeId:
                 Category: Source
-                Owner: ThirdParty
-                Provider: CodeStarSourceConnection
+                Owner: AWS
+                Provider: S3
                 Version: '1'
               OutputArtifacts:
                 - Name: SourceOutput
               Configuration:
-                ConnectionArn: !Ref CodeStarConnectionArn
-                FullRepositoryId: !Ref GitHubRepository
-                BranchName: !Ref GitHubBranch
+                S3Bucket: !Ref S3BucketName
+                S3ObjectKey: !Ref S3ObjectKey
               RunOrder: 1
 
         - Name: Deploy
