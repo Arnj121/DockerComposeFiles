@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFormation template to create an EC2 instance and a security group.
+
+Resources:
+  # Security Group Resource
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow connection to these ports
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 2000
+          ToPort: 2000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 2002
+          ToPort: 2002
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 2045
+          ToPort: 2045
+          CidrIp: 0.0.0.0/0
+
+  # EC2 Instance Resource
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-06b21ccaeff8cd686
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
+      KeyName: myec2keypair
+      IamInstanceProfile: arn:aws:iam::851725471730:instance-profile/CodeDeployDemo-EC2-Instance-Profile
+      Tags:
+        - Key: Name
+          Value: AutoDeploy
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo su
+          yum install ruby -y
+          wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+          chmod +x install
+          ./install auto
+          service codedeploy-agent start
+Outputs:
+  InstanceId:
+    Description: The Instance ID of the EC2 instance
+    Value: !Ref EC2Instance1
+
+  PublicIP:
+    Description: The Public IP address of the EC2 instance
+    Value: !GetAtt EC2Instance1.PublicIp
