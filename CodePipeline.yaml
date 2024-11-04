@@ -17,11 +17,10 @@ Parameters:
     Type: String
     Default: master
 
-  GitHubToken:
-    Description: GitHub Personal Access Token with access to the repository
+  CodeStarConnectionArn:
+    Description: CodeStar Connection ARN for GitHub App integration
     Type: String
     Default: arn:aws:codeconnections:us-east-1:851725471730:connection/9759bf34-f347-4e43-99a4-fdd7ec433516
-    NoEcho: true  # Secure this parameter to prevent display in logs
 
   ApplicationName:
     Description: The name of the CodeDeploy application
@@ -81,15 +80,14 @@ Resources:
               ActionTypeId:
                 Category: Source
                 Owner: ThirdParty
-                Provider: GitHub
+                Provider: CodeStarSourceConnection
                 Version: '1'
               OutputArtifacts:
                 - Name: SourceOutput
               Configuration:
-                Owner: !Select [ 0, !Split [ "/", !Ref GitHubRepository ] ]
-                Repo: !Select [ 1, !Split [ "/", !Ref GitHubRepository ] ]
-                Branch: !Ref GitHubBranch
-                OAuthToken: !Ref GitHubToken
+                ConnectionArn: !Ref CodeStarConnectionArn
+                FullRepositoryId: !Ref GitHubRepository
+                BranchName: !Ref GitHubBranch
               RunOrder: 1
 
         - Name: Deploy
