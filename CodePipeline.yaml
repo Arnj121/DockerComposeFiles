@@ -5,7 +5,7 @@ Parameters:
   PipelineName:
     Description: The name of the CodePipeline
     Type: String
-    Default: MyCodePipeline
+    Default: codepipeline
 
   GitHubRepository:
     Description: The GitHub repository name (e.g., username/repo-name)
@@ -63,7 +63,7 @@ Resources:
   CodePipelineBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${PipelineName}-artifacts"
+      BucketName: !Sub "${PipelineName}-${AWS::Region}-${AWS::AccountId}-artifacts"
 
   # CodePipeline
   CodePipeline:
