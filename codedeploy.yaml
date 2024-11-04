@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create AWS CodeDeploy resources for EC2 deployment
+
+Parameters:
+  ApplicationName:
+    Description: The name of the CodeDeploy application
+    Type: String
+    Default: MyCodeDeployApp
+
+  DeploymentGroupName:
+    Description: The name of the CodeDeploy deployment group
+    Type: String
+    Default: MyDeploymentGroup
+
+  EC2TagKey:
+    Description: The EC2 instance tag key used to identify deployment targets
+    Type: String
+    Default: Name
+
+  EC2TagValue:
+    Description: The EC2 instance tag value used to identify deployment targets
+    Type: String
+    Default: AutoDeploy
+
+Resources:
+  # CodeDeploy Application
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: !Ref ApplicationName
+      ComputePlatform: Server
+
+  # CodeDeploy Deployment Group
+  CodeDeployDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      ApplicationName: !Ref CodeDeployApplication
+      DeploymentGroupName: !Ref DeploymentGroupName
+      ServiceRoleArn: arn:aws:iam::851725471730:role/CodeDeployServiceRole
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events:
+          - DEPLOYMENT_FAILURE
+      Ec2TagSet:
+        Ec2TagSetList:
+          - Ec2TagGroup:
+              - Key: !Ref EC2TagKey
+                Value: !Ref EC2TagValue
+                Type: KEY_AND_VALUE
+      DeploymentStyle:
+        DeploymentType: IN_PLACE
+        DeploymentOption: WITHOUT_TRAFFIC_CONTROL
+
+Outputs:
+  CodeDeployApplicationName:
+    Description: Name of the CodeDeploy application
+    Value: !Ref CodeDeployApplication
+
+  DeploymentGroupName:
+    Description: Name of the CodeDeploy deployment group
+    Value: !Ref CodeDeployDeploymentGroup

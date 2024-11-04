@@ -34,7 +34,7 @@ Resources:
       SecurityGroupIds:
         - !Ref SecurityGroup1
       KeyName: myec2keypair
-      IamInstanceProfile: arn:aws:iam::851725471730:instance-profile/CodeDeployDemo-EC2-Instance-Profile
+      IamInstanceProfile: CodeDeployDemo-EC2-Instance-Profile
       Tags:
         - Key: Name
           Value: AutoDeploy

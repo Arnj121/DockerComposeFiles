@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create a CodePipeline with GitHub source and CodeDeploy deployment
+
+Parameters:
+  PipelineName:
+    Description: The name of the CodePipeline
+    Type: String
+    Default: MyCodePipeline
+
+  GitHubRepository:
+    Description: The GitHub repository name (e.g., username/repo-name)
+    Type: String
+    Default: arnj121/webos
+
+  GitHubBranch:
+    Description: The branch of the GitHub repository to use
+    Type: String
+    Default: master
+
+  GitHubToken:
+    Description: GitHub Personal Access Token with access to the repository
+    Type: String
+    Default: arn:aws:codeconnections:us-east-1:851725471730:connection/9759bf34-f347-4e43-99a4-fdd7ec433516
+    NoEcho: true  # Secure this parameter to prevent display in logs
+
+  ApplicationName:
+    Description: The name of the CodeDeploy application
+    Type: String
+    Default: MyCodeDeployApp
+
+  DeploymentGroupName:
+    Description: The name of the CodeDeploy deployment group
+    Type: String
+    Default: MyDeploymentGroup
+
+Resources:
+  # IAM Role for CodePipeline
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CodePipelineServiceRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelinePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codepipeline:*
+                  - codedeploy:*
+                  - s3:*
+                  - iam:PassRole
+                Resource: "*"
+
+  # S3 Bucket for CodePipeline Artifacts
+  CodePipelineBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${PipelineName}-artifacts"
+
+  # CodePipeline
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Ref PipelineName
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHub_Source
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: '1'
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                Owner: !Select [ 0, !Split [ "/", !Ref GitHubRepository ] ]
+                Repo: !Select [ 1, !Split [ "/", !Ref GitHubRepository ] ]
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubToken
+              RunOrder: 1
+
+        - Name: Deploy
+          Actions:
+            - Name: CodeDeploy_Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CodeDeploy
+                Version: '1'
+              InputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                ApplicationName: !Ref ApplicationName
+                DeploymentGroupName: !Ref DeploymentGroupName
+              RunOrder: 1
+
+Outputs:
+  PipelineNameOutput:
+    Description: Name of the created CodePipeline
+    Value: !Ref CodePipeline
+
+  CodeDeployApplicationName:
+    Description: Name of the CodeDeploy application
+    Value: !Ref ApplicationName
+
+  DeploymentGroupName:
+    Description: Name of the CodeDeploy deployment group
+    Value: !Ref DeploymentGroupName
