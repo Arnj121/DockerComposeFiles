@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFormation template to create an EC2 instance and a security group.
+
+Resources:
+  # Security Group Resource
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow connection to these ports
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 2000
+          ToPort: 2000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 2002
+          ToPort: 2002
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 2045
+          ToPort: 2045
+          CidrIp: 0.0.0.0/0
+
+  # EC2 Instance Resource
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-06b21ccaeff8cd686
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      KeyName: myec2keypair
+
+Outputs:
+  InstanceId:
+    Description: The Instance ID of the EC2 instance
+    Value: !Ref MyEC2Instance
+
+  PublicIP:
+    Description: The Public IP address of the EC2 instance
+    Value: !GetAtt MyEC2Instance.PublicIp
