@@ -47,6 +47,7 @@ Resources:
           chmod +x install
           ./install auto
           service codedeploy-agent start
+
 Outputs:
   InstanceId:
     Description: The Instance ID of the EC2 instance

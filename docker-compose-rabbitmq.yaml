@@ -1,3 +1,5 @@
+version: "1.1"
+
 services:
   rabbitmq:
     image: rabbitmq:3-management
